@@ -3,6 +3,7 @@
 #include <stdint.h>  
 #include <string>
 
+/* hadoop相关头文件 */
 #include <Pipes.hh>  
 #include <TemplateFactory.hh> 
 #include <StringUtils.hh>
