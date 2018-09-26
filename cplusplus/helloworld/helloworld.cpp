@@ -4,9 +4,9 @@
 #include <string.h>
 
 /* hadoop头文件 */
-#include <Pipes.hh>
-#include <TemplateFactory.hh>
-#include <StringUtils.hh>
+#include "hadoop/Pipes.hh"
+#include "hadoop/TemplateFactory.hh"
+#include "hadoop/StringUtils.hh"
 
 using namespace std;
 
@@ -30,7 +30,7 @@ class LocalMapper : public Mapper
 {
 public:
 	LocalMapper(TaskContext & context){}
-	/* map函数，使用MapContext */
+	/* map函数，使用MapContext，将文件映射成键值对，键和值都是自己选的 */
 	void map(MapContext & context)
 	{
 		/* 从文本中获取输入 */
