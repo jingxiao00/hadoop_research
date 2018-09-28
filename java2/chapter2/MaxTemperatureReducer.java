@@ -1,6 +1,7 @@
 
 import java.io.IOException;
 
+/* hadoop提供的类型和Reducer类 */
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -17,6 +18,7 @@ public class MaxTemperatureReducer
         for (IntWritable value : values) {
             maxValue = Math.max(maxValue, value.get());
         }
+        /* 通过context.write写入的是实际的输出，其余的都被过滤掉了 */
         context.write(key, new IntWritable(maxValue));
     }
 }
