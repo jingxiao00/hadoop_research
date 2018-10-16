@@ -41,6 +41,7 @@ public:
 	void reduce(HadoopPipes::ReduceContext & context)
 	{
 		int maxValue = INT_MIN;
+        /* 遍历一个key的所有value，找最大值 */
 		while (context.nextValue())
 		{
 			/* HadoopUtils提供的toInt方法，将map提供的输入值转换成int */

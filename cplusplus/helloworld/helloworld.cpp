@@ -35,6 +35,7 @@ public:
 	{
 		/* 从文本中获取输入 */
 		string line  = context.getInputValue();
+        /* substr(a,b)意思是，从a指定的下标开始，取b个 */
 		string key	 = line.substr(0, 1);
 		string value = line.substr(2, 3);
 		/* 根据筛选条件洗牌 */

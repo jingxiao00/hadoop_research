@@ -1,16 +1,17 @@
+/* 此文件定义分组比较器 */
 
 import org.apache.hadoop.io.WritableComparable;
-import org.apache.hadoop.io.WritableComparable;
+import org.apache.hadoop.io.WritableComparator;
 
-public class DataTemperatureGroupingComparator
-    extends WritableComparator {
+public class DateTemperatureGroupingComparator extends WritableComparator {
     public DateTemperatureGroupingComparator() {
         super(DateTemperaturePair.class, true);
     }
     @Override
-    public int compare(WritableCompare wc1, WritableComparable wc2) {
-        DateTemperaturePair pair = (DateTemperaturePair) wc1;
-        DateTemperaturePair pair = (DateTemperaturePair) wc2;
-        return pair.getYearMonth().compareTo(pair2.getYearMonth());
+    public int compare(WritableComparable a, WritableComparable b) {
+        DateTemperaturePair pair1 = (DateTemperaturePair) a;
+        DateTemperaturePair pair2 = (DateTemperaturePair) b;
+        return pair1.getYearMonth().compareTo(pair2.getYearMonth());
     }
 }
+
