@@ -1,5 +1,4 @@
 
-/* 此文件负责运行MapReduce作业 */
 import java.io.IOException;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -8,28 +7,23 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 
-public class MaxTemperature {
+public class MaxTemperatureWithCombiner {
     public static void main(String[] args) throws Exception {
-        /* 程序接受两个参数，一个路径指定input，一个路径指定output */
-        if (args.length != 2) {
-            System.err.println("Usage: MaxTemperature <input path> <out path>");
+        if (args.length != 2)
             System.exit(-1);
-        }
 
-        /* 设置作业，用来指导hadoop获取jar包 */
         Job job = new Job();
-        job.setJarByClass(MaxTemperature.class);
-        job.setJobName("MaxTemperature");
-        
-        /* 设置input路径和output路径 */
+        job.setJarByClass(MaxTemperatureWithCombiner.class);
+        job.setJobName("MaxTemperatureWithCombiner");
+
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
-        /* 指定要使用的mapper和reducer，这两个class在jar包中一起提供 */
         job.setMapperClass(MaxTemperatureMapper.class);
+        /* 设置combiner，这里直接复用reducer的逻辑 */
+        job.setCombinerClass(MaxTemperatureReducer.class);
         job.setReducerClass(MaxTemperatureReducer.class);
 
-        /* 控制reduce函数的输出类型，要和Reduce类的输出键和输出值参数匹配 */
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 

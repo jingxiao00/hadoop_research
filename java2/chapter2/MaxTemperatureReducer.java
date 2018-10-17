@@ -8,7 +8,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 public class MaxTemperatureReducer 
         extends Reducer<Text, IntWritable, Text, IntWritable> {
-    /* key是输入的年份，不用处理，values是一个年份对应的气温，自定义规则处理 */
+    /* key是输入的年份，不用处理，values是一个年份对应的气温，是迭代器，自定义规则处理 */
     @Override
     public void reduce(Text key, Iterable<IntWritable> values, Context context)
             throws IOException, InterruptedException {
