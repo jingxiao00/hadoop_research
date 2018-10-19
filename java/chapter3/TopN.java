@@ -16,6 +16,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class TopN {
+    /* TopN问题的Mapper类 */
     public static class TopTenMapper extends
         Mapper<Object, Text, NullWritable, IntWritable> {
         private TreeMap<Integer, String> repToRecordMap = new TreeMap<Integer, String>();
@@ -43,6 +44,7 @@ public class TopN {
         }
     }
 
+    /* TopN问题Reducer类 */
     public static class TopTenReducer extends
         Reducer<NullWritable, IntWritable, NullWritable, IntWritable> {
         private TreeMap<Integer, String> repToRecordMap = new TreeMap<Integer, String>();
@@ -63,6 +65,7 @@ public class TopN {
         }
     }
 
+    /* 主作业流程 */
     public static void main(String[] args) throws Exception {
         if (args.length != 3) {
             throw new IllegalArgumentException(
@@ -77,19 +80,22 @@ public class TopN {
         conf.set("N", args[0]);
         Job job = Job.getInstance(conf, "TopN");
         job.setJobName("TopN");
+
         Path inputPath = new Path(args[1]);
         Path outputPath = new Path(args[2]);
         FileInputFormat.setInputPaths(job, inputPath);
         FileOutputFormat.setOutputPath(job, outputPath);
+
         job.setJarByClass(TopN.class);
         job.setMapperClass(TopTenMapper.class);
         job.setReducerClass(TopTenReducer.class);
         job.setNumReduceTasks(1);
-        job.setMapOutputKeyClass(NullWritable.class);// map阶段的输出的key
-        job.setMapOutputValueClass(IntWritable.class);// map阶段的输出的value
 
-        job.setOutputKeyClass(NullWritable.class);// reduce阶段的输出的key
-        job.setOutputValueClass(IntWritable.class);// reduce阶段的输出的value
+        job.setMapOutputKeyClass(NullWritable.class);
+        job.setMapOutputValueClass(IntWritable.class);
+
+        job.setOutputKeyClass(NullWritable.class);
+        job.setOutputValueClass(IntWritable.class);
 
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
