@@ -1,5 +1,5 @@
 
-
+/* 二次排序的mapper */
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -7,6 +7,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
 
+/* 注意输出键的类型是DateTemperaturePair，是自定义的组合键 */
 public class SecondarySortingMapper extends
         Mapper<LongWritable, Text, DateTemperaturePair, IntWritable> {
     @Override

@@ -29,7 +29,8 @@ public class MaxTemperature {
         job.setMapperClass(MaxTemperatureMapper.class);
         job.setReducerClass(MaxTemperatureReducer.class);
 
-        /* 控制reduce函数的输出类型，要和Reduce类的输出键和输出值参数匹配 */
+        /* 控制reduce函数的输出类型，要和Reduce类的输出键和输出值参数匹配，
+         * 这里mapper的输出和reduce一样，所以省略了，否则需要给mapper也设置*/
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 

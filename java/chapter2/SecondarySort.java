@@ -1,4 +1,5 @@
 
+/* 此文件是二次排序的主作业流程 */
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
