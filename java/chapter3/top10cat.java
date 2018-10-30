@@ -15,22 +15,27 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class top10cat {
+    /* topN cat问题Mapper类 */
     public static class catmapper extends
         Mapper<Object, Text, NullWritable, Text> {
+        /* 这是java的map，底层是红黑树 */
         private TreeMap<Double, String> recordmap = new TreeMap<Double, String>();
         public void map(Object key, Text value, Context context) {
             int N = 10;
             N = Integer.parseInt(context.getConfiguration().get("N"));
             String[] tokens = value.toString().split(",");
             Double weight = Double.parseDouble(tokens[0]);
+            /* 解析输入文本后，插入到map中，并删掉超过N的 */
             recordmap.put(weight, value.toString());
             if (recordmap.size() > N)
                 recordmap.remove(recordmap.firstKey());
         }
 
+        /* cleanup方法用于将最终map中剩余的N个元素输出，注意每个mapper都会输出N个 */
         protected void cleanup(Context context) {
             for (String i : recordmap.values()) {
                 try {
+                    /* 使用NullWritable，这样保证所有mapper的输出只有一个reducer处理 */
                     context.write(NullWritable.get(), new Text(i));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -50,6 +55,7 @@ public class top10cat {
                 String[] tokens = value.toString().split(",");
                 Double weight = Double.parseDouble(tokens[0]);
                 recordmap.put(weight, value.toString());
+                /* 归约器要再次处理，因为可能有多个mapper */
                 if (recordmap.size() > N)
                     recordmap.remove(recordmap.firstKey());
             }
