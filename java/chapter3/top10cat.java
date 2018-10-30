@@ -15,53 +15,82 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class top10cat {
-    public static class CatMapper extends
-        Mapper<Object, Text, NUllWritable, String> {
-        private SortedMap<Double, Text> top10cats = new TreeMap<Double, Text>();
-        private int N = 10;
-
-        protected void setup(Context context) {
-            Configuration conf = context.getConfiguration();
-            N = conf.get("N");
-        }
-        public void map(Object key, Text Value, Context context) {
-            String[] tokens = value.split(",");
+    public static class catmapper extends
+        Mapper<Object, Text, NullWritable, Text> {
+        private TreeMap<Double, String> recordmap = new TreeMap<Double, String>();
+        public void map(Object key, Text value, Context context) {
+            int N = 10;
+            N = Integer.parseInt(context.getConfiguration().get("N"));
+            String[] tokens = value.toString().split(",");
             Double weight = Double.parseDouble(tokens[0]);
-            /* 将键值对插入集合中，键是重量，值是整个Text */
-            top10cats.put(weight, value);
-
-            /* 按照重量，只保留N个体重最大的 */
-            if (top10cats.size() > N)
-                top10cats.remove(top10cats.firstKey());
+            recordmap.put(weight, value.toString());
+            if (recordmap.size() > N)
+                recordmap.remove(recordmap.firstKey());
         }
+
         protected void cleanup(Context context) {
-            for (String catAttributes : top10cats.values()) {
-                context.write(NullWritable.get(), catAttributes);
+            for (String i : recordmap.values()) {
+                try {
+                    context.write(NullWritable.get(), new Text(i));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    public static class CatReducer extends
-        Reducer<NullWritable, String, NullWritable, Text> {
+    public static class catreducer extends
+        Reducer<NullWritable, Text, NullWritable, Text> {
+        private TreeMap<Double, String> recordmap = new TreeMap<Double, String>();
         public void reduce(NullWritable key, Iterable<Text> values,
-        Context context) {
-            SortedMap<Double, Text> finatop10 = new TreeMap<Double, Text>();
-            /* 将所有value加入集合中，然后删除到只剩下N个 */
-            for (Text catRecord : values) {
-                String[] tokens = catRecord.split(",");
-                /* 从token[0]中解析出Double类型的键 */
+        Context context) throws IOException, InterruptedException {
+            int N = 10;
+            N = Integer.parseInt(context.getConfiguration().get("N"));
+            for (Text value : values) {
+                String[] tokens = value.toString().split(",");
                 Double weight = Double.parseDouble(tokens[0]);
-                finaltop10.put(weight, value);
-                if (finaltop10.size() > N) {
-                    finaltop10.remove(finaltop10.firstKey());
-                }
+                recordmap.put(weight, value.toString());
+                if (recordmap.size() > N)
+                    recordmap.remove(recordmap.firstKey());
             }
 
-            /* 将最终的N个输出 */
-            for (Text text : finaltop10.values()) {
-                context.write(NullWritable.get(), text);
+            for (String i : recordmap.values()) {
+                context.write(NullWritable.get(), new Text(i));
             }
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        if (args.length != 3) {
+            throw new IllegalArgumentException(
+            "!!!!!!!!!!!!!! Usage!!!!!!!!!!!!!!: hadoop jar <jar-name> "
+            + "top10cat.top10cat "
+            + "<the value of N>"
+            + "<input-path> "
+             + "<output-path>");
+        }
+        Configuration conf = new Configuration();
+        conf.set("N", args[0]);
+        Job job = Job.getInstance(conf, "top10cat");
+        job.setJobName("top10cat");
+
+        Path inputPath = new Path(args[1]);
+        Path outputPath = new Path(args[2]);
+        FileInputFormat.setInputPaths(job, inputPath);
+        FileOutputFormat.setOutputPath(job, outputPath);
+
+        job.setJarByClass(top10cat.class);
+        job.setMapperClass(catmapper.class);
+        job.setReducerClass(catreducer.class);
+        job.setNumReduceTasks(1);
+
+        job.setMapOutputKeyClass(NullWritable.class);
+        job.setMapOutputValueClass(Text.class);
+
+        job.setOutputKeyClass(NullWritable.class);
+        job.setOutputValueClass(Text.class);
+
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
 
