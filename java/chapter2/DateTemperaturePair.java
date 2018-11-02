@@ -34,6 +34,7 @@ public class DateTemperaturePair
         dataOutput.writeInt(temperature);
     }
 
+    /* 从二进制字符流中读取数据为java内置类型 */
     public void readFields(DataInput dataInput) throws IOException {
         this.yearMonth = Text.readString(dataInput);
         this.temperature = dataInput.readInt();
